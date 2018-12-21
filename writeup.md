@@ -19,9 +19,9 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./calibration/calibration18.jpg "One Checkerbaord Calibaration Image"
+[image1]: ./camaera_cal/calibration18.jpg "One Checkerbaord Calibaration Image"
 [image1a]: ./output_images/calibration18.jpg "Same Checkerboard Calibration Image Undistorted and Transformed"
-[image2]: ./output_images/test7.jpg "Road Transformed"
+[image2]: ./output_images/test6.jpg "Road Transformed"
 [image3]: ./output_images/binary_warped.jpg "Binary Example"
 [image4]: ./test_images/straight_lines1.jpg "UnWarped Input"
 [image4a]: ./output_images/output_imagesstraight_lines1.jpg "Warp Output"
@@ -70,7 +70,7 @@ The lane_boundaries_pipeline object has most of the code for the project.  The c
 
 #### 1. Provide an example of a distortion-corrected image.
 
-To demonstrate this step, I will describe how I apply the distortion correction to one of the test images like this one:
+To demonstrate this step, I will describe how I apply the distortion correction to eventually create an image like this one:
 ![alt text][image2]
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
@@ -81,7 +81,7 @@ I used a combination of color and gradient thresholds to generate a binary image
 
 #### 3. Describe how (and identify where in your code) you performed a perspective transform and provide an example of a transformed image.
 
-The code for my perspective transform includes a function called `warper()`, which appears in lines 1 through 8 in the file `example.py` (output_images/examples/example.py) (or, for example, in the 3rd code cell of the IPython notebook).  The `warper()` function takes as inputs an image (`img`), as well as source (`src`) and destination (`dst`) points.  I chose the hardcode the source and destination points in the following manner:
+The code for my perspective transform includes a function called `lane_unwarp()`, which appears in section 1.2 of the notebook.  I choose to parameterize the src and dst points based on the image size.
 
 ```python
 Y, X, Z = img.shape
@@ -101,25 +101,41 @@ This resulted in the following source and destination points:
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
 
 ![alt text][image4]
+![alt text][image4a]
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
 
-Then I did some other stuff and fit my lane lines with a 2nd order polynomial kinda like this:
+I used the lane search from prior method for finding the lane lines as presented in the Advanced Computer Vision lesson.  I kept track of the best fit polynomial for the found pixels, as well as the best fit polynomial for the pixels mapped to meters, separately in the Line object.  For each fit, I averaged over the last 8 fits.
 
-![alt text][image5]
-
+Below is an example fit (in pixels):
 
 ```python
 best_fit = [  2.99396595e-04  -3.70259762e-01   1.10956875e+03]
 ```
 
+
+Fitst there is a find_lane_pixels() function which is called when a fit hasn't been made yet.  Once a fit is made, the search_around_prior looks around a window of that polynomial and asks for a slightly different fit.
+
+![alt text][image5]
+
+
+
 #### 5. Describe how (and identify where in your code) you calculated the radius of curvature of the lane and the position of the vehicle with respect to center.
 
-I did this in lines # through # in my code in `my_other_file.py`
+I calculated the radius of curvature in the measure_curvature() function in the Line object in section 2.0 of the notebook.
+I took the fit in meters, used the max y in the stored y points and applied the formula from the lesson on radius of curvature.
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-I implemented this step in lines # through # in my code in `yet_another_file.py` in the function `map_lane()`.  Here is an example of my result on a test image:
+The annotate_image() function in section 4.1 does the actual annotation on the image.  As stated earlier, there are three things annotated on to the image:
+
+1. Green polygon indicating the lane
+2. Radius of curvature of the lane (in m).
+3. Offset from the center of the lane (in m).
+
+Here is an example of my result on a test image:
+
+![alt text][image2]
 
 ---
 
@@ -135,4 +151,8 @@ Here's a [link to my video result](./output_images/project_video.mp4)
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-Here I'll talk about the approach I took, what techniques I used, what worked and why, where the pipeline might fail and how I might improve it if I were going to pursue this project further.  
+Finding the src and dst points was one of the most frustrating points of the project.  As summarized in this post in the student hub, referencing the src/dst points from the writeup_template.md file:
+
+take the src/dst points above and replace (585, 460) with (585, 400) and (695, 460) with (695, 400) and apply the transform and you'll get an image that isn't anywhere close to a top-down perspective. The order of the points isn't wrong, and the shape isn't wrong; but it wasn't immediately intuitive to me that all I had to do was move the top line of the trapezoid on the src image down by 60 pixels to go from completely unusable as a top-down perspective to spot on. I wasn't expecting that amount of sensitivity in the transform function - again, no change to the shape or order of the src points and no change to any of the dst points.
+
+I would like to have implemented the convolution method for window search, but did not have time for it.  I would also have liked to spend time on the challenge videos, but had a difficult time taking frames from them to debug the pipeline.  Could someone give a code snippet that grabs one (or several) frames from a video to debug a pipeline - that would be really helpful and is apprently beyond me now!
