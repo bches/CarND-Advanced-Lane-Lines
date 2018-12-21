@@ -19,7 +19,7 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./camaera_cal/calibration18.jpg "One Checkerbaord Calibaration Image"
+[image1]: ./camera_cal/calibration18.jpg "One Checkerbaord Calibaration Image"
 [image1a]: ./output_images/calibration18.jpg "Same Checkerboard Calibration Image Undistorted and Transformed"
 [image2]: ./output_images/test6.jpg "Road Transformed"
 [image3]: ./output_images/binary_warped.jpg "Binary Example"
@@ -75,7 +75,7 @@ To demonstrate this step, I will describe how I apply the distortion correction 
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I used a combination of color and gradient thresholds to generate a binary image (thresholding steps at lines # through # in `another_file.py`).  Here's an example of my output for this step.  (note: this is not actually from one of the test images)
+For binary thresholding I used the derivative in the X direction as well as the saturation value, which required converting from RGB to HLS.  The thresholding can be found in section 3.1 of the notebook.  Here's an example of my output for this step.
 
 ![alt text][image3]
 
